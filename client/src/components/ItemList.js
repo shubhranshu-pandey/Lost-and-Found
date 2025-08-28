@@ -65,7 +65,7 @@ const ItemList = () => {
       
       setMessage({
         type: 'success',
-        text: 'Item claimed successfully! The owner will be notified.'
+        text: 'Claim request submitted successfully! A moderator will review your request and notify you of the decision.'
       });
       
       // Close modal and refresh items

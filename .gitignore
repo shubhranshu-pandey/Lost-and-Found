@@ -19,13 +19,13 @@ dist/
 .env.test.local
 .env.production.local
 
-# Database files
-*.db
-*.sqlite
-*.sqlite3
-lostfound.db
-lostfound.sqlite
-lostfound.sqlite3
+# Database files (commented out to include lostfound.db in repo)
+# *.db
+# *.sqlite
+# *.sqlite3
+# lostfound.db
+# lostfound.sqlite
+# lostfound.sqlite3
 
 # Logs
 logs/

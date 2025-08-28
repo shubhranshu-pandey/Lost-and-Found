@@ -5,10 +5,12 @@ import './ModeratorDashboard.css';
 
 const ModeratorDashboard = () => {
   const [pendingItems, setPendingItems] = useState([]);
+  const [pendingClaims, setPendingClaims] = useState([]);
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [selectedItem, setSelectedItem] = useState(null);
+  const [activeTab, setActiveTab] = useState('items'); // 'items' or 'claims'
 
   useEffect(() => {
     fetchData();
@@ -17,12 +19,14 @@ const ModeratorDashboard = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [pendingResponse, statsResponse] = await Promise.all([
+      const [pendingResponse, claimsResponse, statsResponse] = await Promise.all([
         axios.get('/api/moderator/pending'),
+        axios.get('/api/moderator/claims'),
         axios.get('/api/moderator/stats')
       ]);
       
       setPendingItems(pendingResponse.data);
+      setPendingClaims(claimsResponse.data);
       setStats(statsResponse.data);
     } catch (error) {
       console.error('Error fetching moderator data:', error);
@@ -54,6 +58,29 @@ const ModeratorDashboard = () => {
       setMessage({
         type: 'error',
         text: error.response?.data?.error || 'Failed to update item status.'
+      });
+    }
+  };
+
+  const handleClaimAction = async (claimId, action) => {
+    try {
+      await axios.patch(`/api/moderator/claims/${claimId}`, {
+        action: action,
+        moderatorId: 'mod-001'
+      });
+      
+      setMessage({
+        type: 'success',
+        text: `Claim ${action}d successfully!`
+      });
+      
+      // Refresh data
+      fetchData();
+      
+    } catch (error) {
+      setMessage({
+        type: 'error',
+        text: error.response?.data?.error || 'Failed to update claim status.'
       });
     }
   };
@@ -115,7 +142,17 @@ const ModeratorDashboard = () => {
           </div>
           <div className="stat-content">
             <div className="stat-number">{stats.pending_approval || 0}</div>
-            <div className="stat-label">Pending Approval</div>
+            <div className="stat-label">Pending Items</div>
+          </div>
+        </div>
+        
+        <div className="stat-card">
+          <div className="stat-icon pending">
+            <Clock size={24} />
+          </div>
+          <div className="stat-content">
+            <div className="stat-number">{stats.pending_claims || 0}</div>
+            <div className="stat-label">Pending Claims</div>
           </div>
         </div>
         
@@ -125,7 +162,7 @@ const ModeratorDashboard = () => {
           </div>
           <div className="stat-content">
             <div className="stat-number">{stats.approved || 0}</div>
-            <div className="stat-label">Approved</div>
+            <div className="stat-label">Approved Items</div>
           </div>
         </div>
         
@@ -135,110 +172,203 @@ const ModeratorDashboard = () => {
           </div>
           <div className="stat-content">
             <div className="stat-number">{stats.claimed || 0}</div>
-            <div className="stat-label">Claimed</div>
-          </div>
-        </div>
-        
-        <div className="stat-card">
-          <div className="stat-icon rejected">
-            <XCircle size={24} />
-          </div>
-          <div className="stat-content">
-            <div className="stat-number">{stats.rejected || 0}</div>
-            <div className="stat-label">Rejected</div>
+            <div className="stat-label">Claimed Items</div>
           </div>
         </div>
       </div>
 
-      {/* Pending Items */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title">
-            <Clock size={24} />
-            Pending Approval ({pendingItems.length})
-          </h2>
-          <p className="text-secondary">
-            Review these items and decide whether to approve or reject them.
-          </p>
-        </div>
-
-        {pendingItems.length === 0 ? (
-          <div className="text-center p-6">
-            <CheckCircle size={48} className="text-success mb-4" />
-            <h3>All Caught Up!</h3>
-            <p className="text-secondary">No items are currently pending approval.</p>
-          </div>
-        ) : (
-          <div className="pending-items">
-            {pendingItems.map(item => (
-              <div key={item.id} className="pending-item">
-                <div className="item-main">
-                  <div className="item-header">
-                    <div className="item-type">
-                      {getTypeIcon(item.type)} {item.type}
-                    </div>
-                    <div className="item-date">
-                      {new Date(item.created_at).toLocaleDateString()}
-                    </div>
-                  </div>
-                  
-                  <h3 className="item-title">{item.title}</h3>
-                  <p className="item-description">{item.description}</p>
-                  
-                  <div className="item-details">
-                    {item.location && (
-                      <div className="item-detail">
-                        <span className="detail-label">Location:</span>
-                        <span>{item.location}</span>
-                      </div>
-                    )}
-                    
-                    {item.date && (
-                      <div className="item-detail">
-                        <span className="detail-label">Date:</span>
-                        <span>{new Date(item.date).toLocaleDateString()}</span>
-                      </div>
-                    )}
-                    
-                    {item.contact && (
-                      <div className="item-detail">
-                        <span className="detail-label">Contact:</span>
-                        <span>{item.contact}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="item-actions">
-                  <button
-                    onClick={() => setSelectedItem(item)}
-                    className="btn btn-outline btn-sm"
-                  >
-                    <Eye size={16} />
-                    View Details
-                  </button>
-                  
-                  <button
-                    onClick={() => handleStatusUpdate(item.id, 'approved')}
-                    className="btn btn-success btn-sm"
-                  >
-                    <CheckCircle size={16} />
-                    Approve
-                  </button>
-                  
-                  <button
-                    onClick={() => handleStatusUpdate(item.id, 'rejected')}
-                    className="btn btn-danger btn-sm"
-                  >
-                    <XCircle size={16} />
-                    Reject
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+      {/* Tabs */}
+      <div className="tabs">
+        <button
+          className={`tab ${activeTab === 'items' ? 'active' : ''}`}
+          onClick={() => setActiveTab('items')}
+        >
+          <Clock size={20} />
+          Pending Items ({pendingItems.length})
+        </button>
+        <button
+          className={`tab ${activeTab === 'claims' ? 'active' : ''}`}
+          onClick={() => setActiveTab('claims')}
+        >
+          <Shield size={20} />
+          Pending Claims ({pendingClaims.length})
+        </button>
       </div>
+
+      {/* Tab Content */}
+      {activeTab === 'items' && (
+        <div className="card">
+          <div className="card-header">
+            <h2 className="card-title">
+              <Clock size={24} />
+              Pending Items ({pendingItems.length})
+            </h2>
+            <p className="text-secondary">
+              Review these items and decide whether to approve or reject them.
+            </p>
+          </div>
+
+          {pendingItems.length === 0 ? (
+            <div className="text-center p-6">
+              <CheckCircle size={48} className="text-success mb-4" />
+              <h3>All Caught Up!</h3>
+              <p className="text-secondary">No items are currently pending approval.</p>
+            </div>
+          ) : (
+            <div className="pending-items">
+              {pendingItems.map(item => (
+                <div key={item.id} className="pending-item">
+                  <div className="item-main">
+                    <div className="item-header">
+                      <div className="item-type">
+                        {getTypeIcon(item.type)} {item.type}
+                      </div>
+                      <div className="item-date">
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                    
+                    <h3 className="item-title">{item.title}</h3>
+                    <p className="item-description">{item.description}</p>
+                    
+                    <div className="item-details">
+                      {item.location && (
+                        <div className="item-detail">
+                          <span className="detail-label">Location:</span>
+                          <span>{item.location}</span>
+                        </div>
+                      )}
+                      
+                      {item.date && (
+                        <div className="item-detail">
+                          <span className="detail-label">Date:</span>
+                          <span>{new Date(item.date).toLocaleDateString()}</span>
+                        </div>
+                      )}
+                      
+                      {item.contact && (
+                        <div className="item-detail">
+                          <span className="detail-label">Contact:</span>
+                          <span>{item.contact}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="item-actions">
+                    <button
+                      onClick={() => setSelectedItem(item)}
+                      className="btn btn-outline btn-sm"
+                    >
+                      <Eye size={16} />
+                      View Details
+                    </button>
+                    
+                    <button
+                      onClick={() => handleStatusUpdate(item.id, 'approved')}
+                      className="btn btn-success btn-sm"
+                    >
+                      <CheckCircle size={16} />
+                      Approve
+                    </button>
+                    
+                    <button
+                      onClick={() => handleStatusUpdate(item.id, 'rejected')}
+                      className="btn btn-danger btn-sm"
+                    >
+                      <XCircle size={16} />
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'claims' && (
+        <div className="card">
+          <div className="card-header">
+            <h2 className="card-title">
+              <Shield size={24} />
+              Pending Claims ({pendingClaims.length})
+            </h2>
+            <p className="text-secondary">
+              Review claim requests and decide whether to approve or reject them.
+            </p>
+          </div>
+
+          {pendingClaims.length === 0 ? (
+            <div className="text-center p-6">
+              <CheckCircle size={48} className="text-success mb-4" />
+              <h3>No Pending Claims!</h3>
+              <p className="text-secondary">No claim requests are currently pending review.</p>
+            </div>
+          ) : (
+            <div className="pending-items">
+              {pendingClaims.map(claim => (
+                <div key={claim.id} className="pending-item">
+                  <div className="item-main">
+                    <div className="item-header">
+                      <div className="item-type">
+                        {getTypeIcon(claim.type)} {claim.type} - CLAIM REQUEST
+                      </div>
+                      <div className="item-date">
+                        {new Date(claim.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                    
+                    <h3 className="item-title">{claim.title}</h3>
+                    <p className="item-description">{claim.description}</p>
+                    
+                    <div className="item-details">
+                      <div className="item-detail">
+                        <span className="detail-label">Claimant:</span>
+                        <span>{claim.claimant_name}</span>
+                      </div>
+                      <div className="item-detail">
+                        <span className="detail-label">Claimant ID:</span>
+                        <span>{claim.claimant_id}</span>
+                      </div>
+                      {claim.location && (
+                        <div className="item-detail">
+                          <span className="detail-label">Location:</span>
+                          <span>{claim.location}</span>
+                        </div>
+                      )}
+                      {claim.date && (
+                        <div className="item-detail">
+                          <span className="detail-label">Date:</span>
+                          <span>{new Date(claim.date).toLocaleDateString()}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="item-actions">
+                    <button
+                      onClick={() => handleClaimAction(claim.id, 'approve')}
+                      className="btn btn-success btn-sm"
+                    >
+                      <CheckCircle size={16} />
+                      Approve Claim
+                    </button>
+                    
+                    <button
+                      onClick={() => handleClaimAction(claim.id, 'reject')}
+                      className="btn btn-danger btn-sm"
+                    >
+                      <XCircle size={16} />
+                      Reject Claim
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Item Detail Modal */}
       {selectedItem && (

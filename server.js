@@ -8,7 +8,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// Middleware
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -41,6 +41,18 @@ db.serialize(() => {
     role TEXT DEFAULT 'user'
   )`);
 
+  // Claims table for claim requests
+  db.run(`CREATE TABLE IF NOT EXISTS claims (
+    id TEXT PRIMARY KEY,
+    item_id TEXT NOT NULL,
+    claimant_name TEXT NOT NULL,
+    claimant_id TEXT NOT NULL,
+    status TEXT DEFAULT 'pending',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (item_id) REFERENCES items (id)
+  )`);
+
   // Insert default moderator
   db.run(`INSERT OR IGNORE INTO users (id, name, email, role) VALUES (?, ?, ?, ?)`, 
     ['mod-001', 'Moderator', 'moderator@example.com', 'moderator']);
@@ -49,10 +61,8 @@ db.serialize(() => {
 // Helper function to send notifications
 const sendNotification = (message, type = 'info') => {
   console.log(`🔔 NOTIFICATION [${type.toUpperCase()}]: ${message}`);
-  // In a real app, this would send emails, push notifications, etc.
 };
 
-// Routes
 
 // Get all items (filtered by status)
 app.get('/api/items', (req, res) => {
@@ -165,7 +175,7 @@ app.patch('/api/items/:id/status', (req, res) => {
     });
 });
 
-// Claim item
+// Submit claim request
 app.post('/api/items/:id/claim', (req, res) => {
   const { claimantId, claimantName } = req.body;
   const { id } = req.params;
@@ -174,26 +184,44 @@ app.post('/api/items/:id/claim', (req, res) => {
     return res.status(400).json({ error: 'Claimant ID and name are required' });
   }
 
-  db.run('UPDATE items SET status = ?, claimant_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = ?', 
-    ['claimed', claimantId, id, 'approved'], function(err) {
+  // First check if item exists and is approved
+  db.get('SELECT * FROM items WHERE id = ? AND status = ?', [id, 'approved'], (err, item) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    if (!item) {
+      return res.status(400).json({ error: 'Item not found or not available for claiming' });
+    }
+
+    // Check if there's already a pending claim for this item
+    db.get('SELECT * FROM claims WHERE item_id = ? AND status = ?', [id, 'pending'], (err, existingClaim) => {
       if (err) {
-        res.status(500).json({ error: err.message });
-        return;
+        return res.status(500).json({ error: err.message });
       }
 
-      if (this.changes === 0) {
-        return res.status(400).json({ error: 'Item not found or not available for claiming' });
+      if (existingClaim) {
+        return res.status(400).json({ error: 'There is already a pending claim for this item' });
       }
 
-      // Get item details for notification
-      db.get('SELECT * FROM items WHERE id = ?', [id], (err, item) => {
-        if (item) {
-          sendNotification(`Item "${item.title}" has been claimed by ${claimantName}`, 'claim');
-        }
-      });
+      // Create new claim request
+      const claimId = uuidv4();
+      db.run(`INSERT INTO claims (id, item_id, claimant_name, claimant_id, status) 
+               VALUES (?, ?, ?, ?, ?)`,
+        [claimId, id, claimantName, claimantId, 'pending'],
+        function(err) {
+          if (err) {
+            return res.status(500).json({ error: err.message });
+          }
 
-      res.json({ message: 'Item claimed successfully' });
+          sendNotification(`New claim request for "${item.title}" by ${claimantName}`, 'claim_request');
+          res.json({ 
+            message: 'Claim request submitted successfully! A moderator will review your request.',
+            claimId: claimId
+          });
+        });
     });
+  });
 });
 
 // Get pending items for moderator
@@ -208,30 +236,117 @@ app.get('/api/moderator/pending', (req, res) => {
     });
 });
 
+// Get pending claims for moderator
+app.get('/api/moderator/claims', (req, res) => {
+  db.all(`SELECT c.*, i.title, i.description, i.type, i.location, i.date 
+          FROM claims c 
+          JOIN items i ON c.item_id = i.id 
+          WHERE c.status = 'pending' 
+          ORDER BY c.created_at ASC`, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(rows);
+  });
+});
+
+// Approve or reject claim
+app.patch('/api/moderator/claims/:claimId', (req, res) => {
+  const { claimId } = req.params;
+  const { action, moderatorId } = req.body; // action: 'approve' or 'reject'
+
+  if (!['approve', 'reject'].includes(action)) {
+    return res.status(400).json({ error: 'Invalid action. Must be approve or reject' });
+  }
+
+  // Get claim details
+  db.get(`SELECT c.*, i.title FROM claims c JOIN items i ON c.item_id = i.id WHERE c.id = ?`, 
+    [claimId], (err, claim) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+
+      if (!claim) {
+        return res.status(404).json({ error: 'Claim not found' });
+      }
+
+      if (claim.status !== 'pending') {
+        return res.status(400).json({ error: 'Claim has already been processed' });
+      }
+
+      const newClaimStatus = action === 'approve' ? 'approved' : 'rejected';
+      
+      // Update claim status
+      db.run('UPDATE claims SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', 
+        [newClaimStatus, claimId], function(err) {
+          if (err) {
+            return res.status(500).json({ error: err.message });
+          }
+
+          if (action === 'approve') {
+            // If approved, update item status to claimed and set claimant
+            db.run('UPDATE items SET status = ?, claimant_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', 
+              ['claimed', claim.claimant_id, claim.item_id], function(err) {
+                if (err) {
+                  return res.status(500).json({ error: err.message });
+                }
+
+                sendNotification(`Claim approved: "${claim.title}" claimed by ${claim.claimant_name}`, 'claim_approved');
+                res.json({ message: 'Claim approved successfully' });
+              });
+          } else {
+            // If rejected, just send notification
+            sendNotification(`Claim rejected: "${claim.title}" claim by ${claim.claimant_name} was rejected`, 'claim_rejected');
+            res.json({ message: 'Claim rejected successfully' });
+          }
+        });
+    });
+});
+
 // Get moderator dashboard stats
 app.get('/api/moderator/stats', (req, res) => {
   db.all(`SELECT 
     status, 
     COUNT(*) as count 
     FROM items 
-    GROUP BY status`, (err, rows) => {
+    GROUP BY status`, (err, itemRows) => {
       if (err) {
         res.status(500).json({ error: err.message });
         return;
       }
       
-      const stats = {
-        pending_approval: 0,
-        approved: 0,
-        claimed: 0,
-        rejected: 0
-      };
-      
-      rows.forEach(row => {
-        stats[row.status] = row.count;
-      });
-      
-      res.json(stats);
+      // Get claim stats
+      db.all(`SELECT 
+        status, 
+        COUNT(*) as count 
+        FROM claims 
+        GROUP BY status`, (err, claimRows) => {
+          if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+          }
+          
+          const stats = {
+            pending_approval: 0,
+            approved: 0,
+            claimed: 0,
+            rejected: 0,
+            pending_claims: 0,
+            approved_claims: 0,
+            rejected_claims: 0
+          };
+          
+          itemRows.forEach(row => {
+            stats[row.status] = row.count;
+          });
+          
+          claimRows.forEach(row => {
+            stats[`${row.status}_claims`] = row.count;
+          });
+          
+          res.json(stats);
+        });
     });
 });
 

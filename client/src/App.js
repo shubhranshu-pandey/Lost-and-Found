@@ -9,7 +9,7 @@ import Login from './components/Login';
 import './App.css';
 
 function App() {
-  const [userRole, setUserRole] = useState('user'); // 'user' or 'moderator'
+  const [userRole, setUserRole] = useState('user');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
 
