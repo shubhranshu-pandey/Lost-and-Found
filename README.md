@@ -39,12 +39,6 @@ This is a **Lost & Found Portal** - a web-based system that allows users to:
 - **Statistics**: Overview of system activity
 - **Detailed View**: Full item information for informed decisions
 
-### 🎨 Modern UI/UX
-- **Responsive Design**: Works on all devices
-- **Intuitive Interface**: Easy navigation and clear actions
-- **Visual Feedback**: Status badges, icons, and notifications
-- **Accessibility**: Screen reader friendly and keyboard navigable
-
 ## 🚀 **How to Start This Project**
 
 ### **Prerequisites**
@@ -196,7 +190,7 @@ CREATE TABLE users (
 
 ### **Full-Stack Development Skills**
 - **Backend Development**: Node.js, Express.js, RESTful APIs
-- **Frontend Development**: React.js, modern UI/UX, responsive design
+- **Frontend Development**: React.js, responsive design
 - **Database Design**: SQLite schema design and management
 - **Authentication**: Role-based access control and security
 
@@ -204,13 +198,6 @@ CREATE TABLE users (
 - **Workflow Management**: Approval processes and status transitions
 - **State Management**: React hooks and component state
 - **API Design**: RESTful endpoints with proper HTTP methods
-- **Error Handling**: Comprehensive error management and user feedback
-
-### **Modern Web Technologies**
-- **Component Architecture**: Modular, reusable React components
-- **CSS Grid & Flexbox**: Modern layout techniques
-- **Responsive Design**: Mobile-first approach
-- **Real-time Updates**: Dynamic content updates and notifications
 
 ### **Project Management**
 - **Version Control**: Git workflow and collaboration
@@ -220,32 +207,11 @@ CREATE TABLE users (
 
 ## 🛠️ Development
 
-### Project Structure
-```
-lost-found-portal/
-├── server.js                 # Express server entry point
-├── package.json             # Backend dependencies
-├── client/                  # React frontend
-│   ├── src/
-│   │   ├── components/      # React components
-│   │   ├── App.js          # Main app component
-│   │   └── index.js        # React entry point
-│   ├── public/             # Static assets
-│   └── package.json        # Frontend dependencies
-└── README.md               # This file
-```
-
 ### Key Components
 - **HomePage**: Landing page with features and quick actions
 - **SubmitItem**: Form for submitting lost/found items
 - **ItemList**: Browse and filter approved items
 - **ModeratorDashboard**: Admin interface for item management
-
-### Styling
-- **CSS Variables**: Consistent color scheme and spacing
-- **Responsive Grid**: Mobile-first design approach
-- **Component CSS**: Scoped styles for each component
-- **Modern UI**: Cards, shadows, and smooth transitions
 
 ## 🔧 **Configuration**
 
@@ -305,5 +271,4 @@ npm start
 
 ---
 
-**This is a project/Assignment for Infinite Locus by Group 13**
-**Thank You for the opportunity**
+**This is a project/Assignment for Infinite Locus by Group 13, Thank You for the opportunity**
