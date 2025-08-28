@@ -7,7 +7,7 @@ const ItemList = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
-    status: 'approved',
+    status: '',
     type: '',
     search: ''
   });
@@ -112,7 +112,7 @@ const ItemList = () => {
         <div className="card-header">
           <h1 className="card-title">Browse Items</h1>
           <p className="text-secondary">
-            Browse through approved lost and found items. Found something that belongs to you? Claim it!
+            Browse through all lost and found items. Found something that belongs to you? Claim it!
           </p>
         </div>
 
@@ -133,6 +133,7 @@ const ItemList = () => {
                 onChange={(e) => handleFilterChange('status', e.target.value)}
                 className="form-select"
               >
+                <option value="">All</option>
                 <option value="approved">Approved</option>
                 <option value="claimed">Claimed</option>
                 <option value="pending_approval">Pending Approval</option>
@@ -169,10 +170,10 @@ const ItemList = () => {
 
             <div className="form-group">
               <label className="form-label">&nbsp;</label>
-              <button
-                onClick={() => setFilters({ status: 'approved', type: '', search: '' })}
-                className="btn btn-outline w-full"
-              >
+                              <button
+                  onClick={() => setFilters({ status: '', type: '', search: '' })}
+                  className="btn btn-outline w-full"
+                >
                 <Filter size={16} />
                 Clear Filters
               </button>
