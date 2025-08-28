@@ -62,6 +62,21 @@
   justify-content: flex-end;
 }
 
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--warning-color);
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
 .main {
   min-height: calc(100vh - 140px);
   padding: 2rem 0;

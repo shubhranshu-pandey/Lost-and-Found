@@ -8,6 +8,7 @@ A comprehensive web application for managing lost and found items with an approv
 - **Moderated Submissions**: All items must be approved by moderators before going public
 - **Status Management**: Items progress through states: Pending → Approved → Claimed
 - **Quality Control**: Ensures safe and appropriate content
+- **Secure Login**: Moderator authentication system with credentials
 
 ### 📱 User Features
 - **Submit Items**: Report lost or found items with detailed information
@@ -16,6 +17,7 @@ A comprehensive web application for managing lost and found items with an approv
 - **Real-time Updates**: Instant status changes and notifications
 
 ### 🛡️ Moderator Dashboard
+- **Secure Access**: Login required with admin credentials
 - **Review Queue**: See all pending submissions
 - **Quick Actions**: Approve/reject items with one click
 - **Statistics**: Overview of system activity
@@ -32,6 +34,10 @@ A comprehensive web application for managing lost and found items with an approv
 ### Prerequisites
 - Node.js (v14 or higher)
 - npm or yarn
+
+### Login Credentials
+- **Username**: `admin`
+- **Password**: `group13`
 
 ### Installation
 

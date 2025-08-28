@@ -1,18 +1,36 @@
 import React, { useState } from 'react';
-import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Search, Plus, Shield, Home, Users } from 'lucide-react';
+import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
+import { Search, Plus, Shield, Home, Users, LogOut } from 'lucide-react';
 import HomePage from './components/HomePage';
 import SubmitItem from './components/SubmitItem';
 import ModeratorDashboard from './components/ModeratorDashboard';
 import ItemList from './components/ItemList';
+import Login from './components/Login';
 import './App.css';
 
 function App() {
   const [userRole, setUserRole] = useState('user'); // 'user' or 'moderator'
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
 
+  const handleLogin = (role) => {
+    setUserRole(role);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setUserRole('user');
+    setIsAuthenticated(false);
+  };
+
   const toggleRole = () => {
-    setUserRole(userRole === 'user' ? 'moderator' : 'user');
+    if (userRole === 'moderator') {
+      handleLogout();
+    } else {
+      setUserRole('moderator');
+      // Navigate to login page
+      window.location.href = '/login';
+    }
   };
 
   const isActive = (path) => location.pathname === path;
@@ -54,7 +72,7 @@ function App() {
                 Browse Items
               </Link>
               
-              {userRole === 'moderator' && (
+              {userRole === 'moderator' && isAuthenticated && (
                 <Link 
                   to="/moderator" 
                   className={`nav-link ${isActive('/moderator') ? 'active' : ''}`}
@@ -66,13 +84,29 @@ function App() {
             </nav>
 
             <div className="header-right">
-              <button 
-                onClick={toggleRole}
-                className={`btn btn-sm ${userRole === 'moderator' ? 'btn-warning' : 'btn-outline'}`}
-              >
-                <Users size={16} />
-                {userRole === 'moderator' ? 'Moderator' : 'User'}
-              </button>
+              {userRole === 'moderator' && isAuthenticated ? (
+                <div className="auth-buttons">
+                  <span className="user-info">
+                    <Shield size={16} />
+                    Moderator
+                  </span>
+                  <button 
+                    onClick={handleLogout}
+                    className="btn btn-danger btn-sm"
+                  >
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={toggleRole}
+                  className="btn btn-outline btn-sm"
+                >
+                  <Users size={16} />
+                  Login as Moderator
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -86,15 +120,22 @@ function App() {
             <Route path="/submit" element={<SubmitItem />} />
             <Route path="/items" element={<ItemList />} />
             <Route 
+              path="/login" 
+              element={
+                userRole === 'moderator' && isAuthenticated ? (
+                  <Navigate to="/moderator" replace />
+                ) : (
+                  <Login onLogin={handleLogin} />
+                )
+              } 
+            />
+            <Route 
               path="/moderator" 
               element={
-                userRole === 'moderator' ? (
+                userRole === 'moderator' && isAuthenticated ? (
                   <ModeratorDashboard />
                 ) : (
-                  <div className="text-center p-6">
-                    <h2>Access Denied</h2>
-                    <p>You need moderator privileges to access this page.</p>
-                  </div>
+                  <Navigate to="/login" replace />
                 )
               } 
             />
