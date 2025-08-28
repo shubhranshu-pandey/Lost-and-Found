@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Plus, Shield, CheckCircle, Clock, Users } from 'lucide-react';
+import { Search, Shield, Clock, Users } from 'lucide-react';
 import './HomePage.css';
 
 const HomePage = () => {
@@ -29,35 +29,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="features">
-        <h2 className="section-title">How It Works</h2>
-        <div className="grid grid-cols-3">
-          <div className="feature-card">
-            <div className="feature-icon">
-              <Plus size={32} />
-            </div>
-            <h3>Submit</h3>
-            <p>Report lost or found items with detailed descriptions and contact information.</p>
-          </div>
-          
-          <div className="feature-card">
-            <div className="feature-icon">
-              <Shield size={32} />
-            </div>
-            <h3>Moderate</h3>
-            <p>Our moderators review and approve submissions to ensure quality and safety.</p>
-          </div>
-          
-          <div className="feature-card">
-            <div className="feature-icon">
-              <CheckCircle size={32} />
-            </div>
-            <h3>Connect</h3>
-            <p>Browse approved items and claim what belongs to you with secure verification.</p>
-          </div>
-        </div>
-      </section>
+
 
       {/* Stats Section */}
       <section className="stats">
@@ -126,19 +98,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Info Section */}
-      <section className="info">
-        <div className="card">
-          <h3>Important Information</h3>
-          <ul className="info-list">
-            <li>All submissions are reviewed by moderators before being made public</li>
-            <li>Provide accurate descriptions and contact information</li>
-            <li>Be honest about the condition and location of items</li>
-            <li>Respect privacy and only share necessary contact details</li>
-            <li>Report suspicious or inappropriate content immediately</li>
-          </ul>
-        </div>
-      </section>
+
     </div>
   );
 };
