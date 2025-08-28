@@ -12,6 +12,7 @@ const ItemList = () => {
     search: ''
   });
   const [claimModal, setClaimModal] = useState({ show: false, item: null });
+  const [viewModal, setViewModal] = useState({ show: false, item: null });
   const [claimForm, setClaimForm] = useState({ claimantId: '', claimantName: '' });
   const [message, setMessage] = useState({ type: '', text: '' });
 
@@ -227,15 +228,15 @@ const ItemList = () => {
                   {item.status === 'approved' && (
                     <button
                       onClick={() => setClaimModal({ show: true, item })}
-                      className="btn btn-success btn-sm"
+                      className={`btn btn-sm ${item.type === 'lost' ? 'btn-primary' : 'btn-success'}`}
                     >
                       <CheckCircle size={16} />
-                      Claim Item
+                      {item.type === 'lost' ? 'I Found This' : 'This is Mine'}
                     </button>
                   )}
                   
                   <button
-                    onClick={() => setClaimModal({ show: true, item })}
+                    onClick={() => setViewModal({ show: true, item })}
                     className="btn btn-outline btn-sm"
                   >
                     <Eye size={16} />
@@ -253,7 +254,7 @@ const ItemList = () => {
         <div className="modal-overlay">
           <div className="modal">
             <div className="modal-header">
-              <h3>Claim Item</h3>
+              <h3>{claimModal.item?.type === 'lost' ? 'Report Found Item' : 'Claim Item'}</h3>
               <button
                 onClick={() => setClaimModal({ show: false, item: null })}
                 className="btn btn-outline btn-sm"
@@ -286,6 +287,15 @@ const ItemList = () => {
                 />
               </div>
               
+              {claimModal.item?.type === 'lost' && (
+                <div className="form-group">
+                  <p className="text-secondary">
+                    By submitting this form, you're reporting that you found this lost item. 
+                    A moderator will review your claim and contact you if approved.
+                  </p>
+                </div>
+              )}
+              
               <div className="modal-actions">
                 <button
                   type="button"
@@ -298,10 +308,99 @@ const ItemList = () => {
                   type="submit"
                   className="btn btn-success"
                 >
-                  Claim Item
+                  {claimModal.item?.type === 'lost' ? 'Report Found' : 'Claim Item'}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* View Details Modal */}
+      {viewModal.show && (
+        <div className="modal-overlay">
+          <div className="modal modal-large">
+            <div className="modal-header">
+              <h3>Item Details</h3>
+              <button
+                onClick={() => setViewModal({ show: false, item: null })}
+                className="btn btn-outline btn-sm"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="item-detail-content">
+              <div className="detail-section">
+                <h4>Basic Information</h4>
+                <div className="detail-grid">
+                  <div className="detail-item">
+                    <span className="detail-label">Type:</span>
+                    <span>{getTypeIcon(viewModal.item.type)} {viewModal.item.type}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Title:</span>
+                    <span>{viewModal.item.title}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Status:</span>
+                    {getStatusBadge(viewModal.item.status)}
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Submitted:</span>
+                    <span>{new Date(viewModal.item.created_at).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="detail-section">
+                <h4>Description</h4>
+                <p>{viewModal.item.description}</p>
+              </div>
+              
+              {viewModal.item.location && (
+                <div className="detail-section">
+                  <h4>Location</h4>
+                  <p>{viewModal.item.location}</p>
+                </div>
+              )}
+              
+              {viewModal.item.date && (
+                <div className="detail-section">
+                  <h4>Date</h4>
+                  <p>{new Date(viewModal.item.date).toLocaleDateString()}</p>
+                </div>
+              )}
+              
+              {viewModal.item.contact && (
+                <div className="detail-section">
+                  <h4>Contact Information</h4>
+                  <p>{viewModal.item.contact}</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="modal-actions">
+              <button
+                onClick={() => setViewModal({ show: false, item: null })}
+                className="btn btn-outline"
+              >
+                Close
+              </button>
+              
+              {viewModal.item.status === 'approved' && (
+                <button
+                  onClick={() => {
+                    setViewModal({ show: false, item: null });
+                    setClaimModal({ show: true, item: viewModal.item });
+                  }}
+                  className={`btn ${viewModal.item.type === 'lost' ? 'btn-primary' : 'btn-success'}`}
+                >
+                  <CheckCircle size={16} />
+                  {viewModal.item.type === 'lost' ? 'I Found This' : 'This is Mine'}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
