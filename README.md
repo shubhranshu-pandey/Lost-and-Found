@@ -271,5 +271,4 @@ npm start
 
 ---
 
-**This is a project/Assignment for Infinite Locus by Group 13, **
-**Thank You for the opportunity**
+**This is a project/Assignment for Infinite Locus by Group 13, Thank You for the opportunity**
