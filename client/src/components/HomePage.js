@@ -20,7 +20,7 @@ const HomePage = () => {
             <Link to="/submit" className="btn btn-primary btn-lg">
               Submit Item
             </Link>
-            <Link to="/items" className="btn btn-outline btn-lg">
+            <Link to="/items" className="btn btn-success btn-lg">
               <Search size={20} />
               Browse Items
             </Link>
