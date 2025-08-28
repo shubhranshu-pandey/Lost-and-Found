@@ -41,47 +41,7 @@
 
 
 
-.stats {
-  margin-bottom: 4rem;
-}
 
-.stat-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.5rem;
-  background: var(--card-background);
-  border-radius: 1rem;
-  box-shadow: var(--shadow);
-}
-
-.stat-icon {
-  width: 60px;
-  height: 60px;
-  background: var(--primary-color);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  flex-shrink: 0;
-}
-
-.stat-content {
-  flex: 1;
-}
-
-.stat-number {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 0.25rem;
-}
-
-.stat-label {
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-}
 
 .quick-actions {
   margin-bottom: 4rem;
@@ -93,6 +53,14 @@
   border-radius: 1rem;
   box-shadow: var(--shadow);
   text-align: center;
+}
+
+.quick-actions h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
 }
 
 .action-card h3 {

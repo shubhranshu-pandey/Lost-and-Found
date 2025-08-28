@@ -255,4 +255,4 @@ For support and questions:
 
 ---
 
-**Built with ❤️ for helping people find their lost items**
+**This is a project/Assignment for Infinite Locus by Group 13**

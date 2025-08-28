@@ -147,8 +147,7 @@ function App() {
       <footer className="footer">
         <div className="container">
           <div className="footer-content">
-            <p>&copy; 2024 Lost & Found Portal. All rights reserved.</p>
-            <p>Built with ❤️ for helping people find their lost items</p>
+            <p>This is a project/Assignment for Infinite Locus by Group 13</p>
           </div>
         </div>
       </footer>
