@@ -8,8 +8,8 @@ WORKDIR /app/client
 # Copy frontend package files
 COPY client/package*.json ./
 
-# Install frontend dependencies
-RUN npm ci --only=production
+# Install ALL dependencies (react-scripts is a devDependency needed for build)
+RUN npm install
 
 # Copy frontend source
 COPY client/ ./
@@ -24,7 +24,7 @@ WORKDIR /app
 
 # Install production dependencies for backend
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Copy backend source files
 COPY server-jwt.js ./
