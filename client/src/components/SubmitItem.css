@@ -1,0 +1,254 @@
+.submit-item {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.submit-item .card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 3rem;
+  border: 1px solid var(--border);
+}
+
+.submit-item .card-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.submit-item .card-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--black);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.03em;
+}
+
+.submit-item .card-header p {
+  color: var(--text-secondary);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Form Styling */
+.submit-item form {
+  margin-bottom: 2rem;
+}
+
+.submit-item .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.submit-item .form-label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 0.625rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  letter-spacing: -0.01em;
+}
+
+.submit-item .form-label::after {
+  content: "*";
+  color: var(--black);
+  margin-left: 0.125rem;
+  font-weight: 700;
+}
+
+.submit-item .form-label:has(+ input:not([required]))::after,
+.submit-item .form-label:has(+ select:not([required]))::after,
+.submit-item .form-label:has(+ textarea:not([required]))::after {
+  content: "(optional)";
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  margin-left: 0.5rem;
+}
+
+.submit-item .form-input,
+.submit-item .form-select,
+.submit-item .form-textarea {
+  font-size: 1rem;
+  padding: 0.875rem 1rem;
+}
+
+.submit-item .form-input::placeholder,
+.submit-item .form-textarea::placeholder {
+  color: var(--gray-400);
+}
+
+.submit-item .form-textarea {
+  min-height: 140px;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.submit-item small {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Form Actions */
+.submit-item .form-actions {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
+}
+
+.submit-item .form-actions .btn {
+  min-width: 220px;
+  padding: 1rem 2.5rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+/* Submission Info */
+.submission-info {
+  background: var(--gray-100);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-top: 2rem;
+  border: 2px solid var(--border);
+}
+
+.submission-info h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+.submission-info h3::before {
+  content: "ℹ";
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.submission-info ol {
+  padding-left: 1.5rem;
+  margin: 0;
+}
+
+.submission-info li {
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+  font-size: 0.9375rem;
+}
+
+.submission-info li:last-child {
+  margin-bottom: 0;
+}
+
+/* Alert Styling */
+.submit-item .alert {
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.submit-item .alert svg {
+  flex-shrink: 0;
+}
+
+/* Grid Layout for Form */
+.submit-item .grid {
+  gap: 1.5rem;
+}
+
+/* Loading State */
+.submit-item .btn .spinner {
+  width: 18px;
+  height: 18px;
+}
+
+/* Success State Animation */
+.submit-item .alert-success {
+  animation: successPulse 0.5s ease;
+}
+
+@keyframes successPulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .submit-item .card {
+    padding: 2.5rem 2rem;
+  }
+
+  .submit-item .card-title {
+    font-size: 1.75rem;
+  }
+
+  .submit-item .card-header p {
+    font-size: 1rem;
+  }
+
+  .submission-info {
+    padding: 1.5rem;
+  }
+
+  .submit-item .form-actions .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .submit-item .card {
+    padding: 2rem 1.5rem;
+  }
+
+  .submit-item .card-title {
+    font-size: 1.5rem;
+  }
+
+  .submission-info {
+    padding: 1.25rem;
+  }
+
+  .submission-info h3 {
+    font-size: 1rem;
+  }
+
+  .submission-info li {
+    font-size: 0.875rem;
+  }
+}

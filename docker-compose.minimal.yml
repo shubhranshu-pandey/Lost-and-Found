@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  lost-found-app:
+    build: .
+    container_name: lost-found-portal
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    environment:
+      - NODE_ENV=production
+      - PORT=5001
+    volumes:
+      - lost_found_data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:5001/api/items"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  lost_found_data:
