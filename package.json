@@ -2,10 +2,10 @@
   "name": "lost-found-portal",
   "version": "1.0.0",
   "description": "Lost & Found Portal with Approval Workflow",
-  "main": "server.js",
+  "main": "server-jwt.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node server-jwt.js",
+    "dev": "nodemon server-jwt.js",
     "client": "cd client && npm start",
     "build": "cd client && npm run build",
     "install-all": "npm install && cd client && npm install"

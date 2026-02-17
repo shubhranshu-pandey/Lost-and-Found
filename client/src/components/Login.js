@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiShield, FiEye, FiEyeOff, FiAlertCircle } from "react-icons/fi";
+import api from "../utils/api";
 import "./Login.css";
 
 const Login = ({ onLogin }) => {
@@ -29,38 +30,35 @@ const Login = ({ onLogin }) => {
     setError("");
 
     try {
-      // Call the actual JWT API
-      const response = await fetch(
-        "http://localhost:5001/api/auth/moderator/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: credentials.username,
-            password: credentials.password,
-          }),
-        },
-      );
+      // Call the actual JWT API using the api utility
+      const response = await api.post("/auth/moderator/login", {
+        username: credentials.username,
+        password: credentials.password,
+      });
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (response.ok) {
-        // Store token and user info
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+      // Store token and user info
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
-        setLoading(false);
-        onLogin("moderator");
-        navigate("/moderator");
-      } else {
-        setLoading(false);
-        setError(data.error || "Invalid credentials. Please try again.");
-      }
+      setLoading(false);
+      onLogin("moderator");
+      navigate("/moderator");
     } catch (error) {
       setLoading(false);
-      setError("Connection error. Please make sure the server is running.");
+      if (error.response) {
+        // Server responded with error
+        setError(
+          error.response.data.error || "Invalid credentials. Please try again.",
+        );
+      } else if (error.request) {
+        // Request made but no response
+        setError("Connection error. Please make sure the server is running.");
+      } else {
+        // Something else happened
+        setError("An error occurred. Please try again.");
+      }
       console.error("Login error:", error);
     }
   };

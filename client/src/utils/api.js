@@ -1,11 +1,13 @@
 import axios from "axios";
 
 // Create axios instance with dynamic baseURL
+// Check if we're in development mode (React dev server runs on port 3000)
+const isDevelopment = window.location.port === "3000";
+
 const api = axios.create({
-  baseURL:
-    process.env.NODE_ENV === "production"
-      ? "/api" // In production, use relative path (same server)
-      : "http://localhost:5001/api", // In development, use localhost
+  baseURL: isDevelopment
+    ? "http://localhost:5002/api" // In development, use localhost
+    : "/api", // In production, use relative path (same server)
 });
 
 // Add request interceptor to include JWT token
